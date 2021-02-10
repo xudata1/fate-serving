@@ -16,14 +16,17 @@
 
 package com.webank.ai.fate.serving.adaptor.dataaccess;
 
+import com.webank.ai.fate.serving.adaptor.util.CommonUtil;
 import com.webank.ai.fate.serving.core.bean.BatchHostFeatureAdaptorResult;
 import com.webank.ai.fate.serving.core.bean.BatchHostFederatedParams;
+import com.webank.ai.fate.serving.core.bean.BatchInferenceRequest;
 import com.webank.ai.fate.serving.core.bean.Context;
 import com.webank.ai.fate.serving.core.constant.StatusCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +42,18 @@ public class MockBatchAdapter extends AbstractBatchFeatureDataAdaptor {
     public BatchHostFeatureAdaptorResult getFeatures(Context context, List<BatchHostFederatedParams.SingleInferenceData> featureIdList) {
 
         BatchHostFeatureAdaptorResult batchHostFeatureAdaptorResult = new BatchHostFeatureAdaptorResult();
+        HashMap<BatchInferenceRequest.SingleInferenceData, String> tableDataStringHashMap = new HashMap<>();
+        try {
+            tableDataStringHashMap = CommonUtil.viewMockBatchAdapter(featureIdList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
+        HashMap<BatchInferenceRequest.SingleInferenceData, String> finalTableDataStringHashMap = tableDataStringHashMap;
         featureIdList.forEach(singleInferenceData -> {
             Map<Integer, BatchHostFeatureAdaptorResult.SingleBatchHostFeatureAdaptorResult> indexMap = batchHostFeatureAdaptorResult.getIndexResultMap();
             Map<String, Object> data = new HashMap<>();
-            String mockData = "x0:1,x1:5,x2:13,x3:58,x4:95,x5:352,x6:418,x7:833,x8:888,x9:937,x10:32776";
+            String mockData = finalTableDataStringHashMap.get(singleInferenceData);
             for (String kv : StringUtils.split(mockData, ",")) {
                 String[] a = StringUtils.split(kv, ":");
                 data.put(a[0], Double.valueOf(a[1]));

@@ -16,6 +16,7 @@
 
 package com.webank.ai.fate.serving.adaptor.dataaccess;
 
+import com.webank.ai.fate.serving.adaptor.util.CommonUtil;
 import com.webank.ai.fate.serving.core.bean.Context;
 import com.webank.ai.fate.serving.core.bean.ReturnResult;
 import com.webank.ai.fate.serving.core.constant.StatusCode;
@@ -40,7 +41,7 @@ public class MockAdapter extends AbstractSingleFeatureDataAdaptor {
         ReturnResult returnResult = new ReturnResult();
         Map<String, Object> data = new HashMap<>();
         try {
-            String mockData = "x0:1,x1:5,x2:13,x3:58,x4:95,x5:352,x6:418,x7:833,x8:888,x9:937,x10:32776";
+            String mockData = CommonUtil.viewMockAdapter(featureIds);
             for (String kv : StringUtils.split(mockData, ",")) {
                 String[] a = StringUtils.split(kv, ":");
                 data.put(a[0], Double.valueOf(a[1]));
